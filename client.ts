@@ -8,7 +8,6 @@ export const config = {
   dataset: process.env.NEXT_PUBLIC_SANITY_DATASET,
   useCdn: process.env.NODE_ENV === "production",
   apiVersion: "2023-04-21",
-  // token: process.env.SANITY_TOKEN_API,
 };
 
 export const client = createClient(config);
