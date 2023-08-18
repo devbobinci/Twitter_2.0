@@ -10,10 +10,10 @@ import { BiChat } from "react-icons/bi";
 import { HiOutlineSwitchHorizontal } from "react-icons/hi";
 import { AiOutlineHeart, AiOutlineUpload } from "react-icons/ai";
 import { fetchComments } from "@/lib/fetchComments";
-import { toast, Toaster } from "react-hot-toast";
+import { toast } from "react-hot-toast";
 import { useSession } from "next-auth/react";
+import { BsArrowDown } from "@react-icons/all-files/bs/BsArrowDown";
 
-// Tutaj musze tworzyc interface, a nie przypisywac bezposrednio
 interface Props {
   tweet: Tweet;
 }
@@ -25,6 +25,7 @@ export default function TweetCard({ tweet }: Props) {
   const [commentBoxVisible, setCommentBoxVisible] = useState<boolean>(false);
   const [readMore, setReadMore] = useState<boolean>(false);
   const [input, setInput] = useState<string>("");
+  const [sortedComments, setSortedComments] = useState<Comment[]>([]);
 
   const refreshComments = async () => {
     const comments: Comment[] = await fetchComments(tweet._id);
@@ -34,7 +35,6 @@ export default function TweetCard({ tweet }: Props) {
 
   useEffect(() => {
     refreshComments();
-    console.log(session);
   }, []);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -42,7 +42,6 @@ export default function TweetCard({ tweet }: Props) {
 
     const commentToast = toast.loading("Posting Comment...");
 
-    // Comment logic
     const comment: CommentBody = {
       comment: input,
       tweetId: tweet._id,
@@ -55,8 +54,6 @@ export default function TweetCard({ tweet }: Props) {
       body: JSON.stringify(comment),
     });
 
-    const json = await result.json();
-
     toast.success("Comment Posted!", {
       id: commentToast,
     });
@@ -66,22 +63,22 @@ export default function TweetCard({ tweet }: Props) {
     refreshComments();
   }
 
+  useEffect(() => {
+    if (!readMore && comments.length > 1) {
+      setSortedComments(comments.slice(0, 2));
+    } else {
+      setSortedComments(comments);
+    }
+
+    if (readMore) {
+      setSortedComments(comments);
+    }
+  }, [readMore, comments.length]);
+
   return (
     <div
-      className={`flex flex-col space-x-3 border-y p-5 border-gray-100 h-full scrollbar-hide ${
-        readMore
-          ? "max-h-full overflow-y-scroll "
-          : "max-h-[510px] overflow-y-hidden "
-      } relative`}
+      className={`flex flex-col space-x-3 border-y p-5 border-gray-100 h-full`}
     >
-      {comments.length > 1 && (
-        <div
-          className={`
-          absolute w-full h-12 bg-gradient-to-b from-white to white/20 bottom-0 left-0 backdrop-blur-md z-[1]`}
-        />
-      )}
-      <Toaster />
-
       <div className="flex space-x-3">
         <Image
           src={tweet.profileImg!}
@@ -98,7 +95,6 @@ export default function TweetCard({ tweet }: Props) {
               @{tweet.username.replace(/\s+/g, "").toLowerCase()}.
             </p>
 
-            {/* Biblioteka react-timeago pozwalajaca na obliczenie czasu od podanej daty do teraz. Gdy wyskakuje blad react.useState is not a function, nalezy przypisac temu komponentowi "use client", poniewaz state moze byc tylko w use client */}
             <TimeAgo
               className="text-sm text-gray-500"
               date={tweet._createdAt}
@@ -159,11 +155,20 @@ export default function TweetCard({ tweet }: Props) {
       )}
 
       {comments?.length > 0 && (
-        <div className="my-2 mt-5 max-h-44 space-y-5 overflow-y-scoll border-t border-gray-100 p-5">
-          {comments.map((comment) => (
+        <div className="my-2 mt-5 space-y-5 border-t h-full border-gray-100 p-5 relative">
+          {comments.length > 1 && !readMore && (
+            <div
+              className={`absolute w-full h-12 bg-white/80 -bottom-2 left-0 backdrop-blur-lg z-10`}
+            />
+          )}
+          {sortedComments.map((comment, index) => (
             <div key={comment._id} className="relative flex space-x-2">
               {comments.length > 1 && (
-                <hr className="absolute left-5 top-10 h-8 border-x border-twitter/30" />
+                <hr
+                  className={`absolute left-5 top-10 h-8 border-x border-twitter/30 ${
+                    index === comments.length - 1 && "h-0 border-none"
+                  }`}
+                />
               )}
               <Image
                 src={comment.profileImg!}
@@ -188,12 +193,23 @@ export default function TweetCard({ tweet }: Props) {
               </div>
             </div>
           ))}
-          <button
-            className="absolute right-5 bottom-12 text-white text-sm bg-twitter px-4 py-2 rounded-lg"
-            onClick={() => setReadMore((prev) => !prev)}
-          >
-            {readMore ? "Read Less" : "Read More"}
-          </button>
+          {comments.length > 1 && (
+            <button
+              className={`absolute right-5 text-white text-sm bg-twitter px-4 py-2 rounded-lg inline-flex gap-1 items-center group ${
+                readMore ? "bottom-4" : "bottom-10"
+              }`}
+              onClick={() => setReadMore((prev) => !prev)}
+            >
+              {readMore ? "Read Less" : "Read More"}
+              <BsArrowDown
+                className={`transition ${
+                  readMore
+                    ? "rotate-180 group-hover:-translate-y-1"
+                    : "group-hover:translate-y-1"
+                }`}
+              />
+            </button>
+          )}
         </div>
       )}
     </div>

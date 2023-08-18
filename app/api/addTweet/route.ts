@@ -27,16 +27,21 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
   const apiEndpoint = `https://${process.env.NEXT_PUBLIC_SANITY_PROJECT_ID}.api.sanity.io/v2023-04-22/data/mutate/${process.env.NEXT_PUBLIC_SANITY_DATASET}`;
 
-  const result = await fetch(apiEndpoint, {
-    method: "POST",
-    headers: {
-      "content-type": "application/json",
-      Authorization: `Bearer ${process.env.SANITY_TOKEN_API}`,
-    },
-    body: JSON.stringify(mutations),
-  });
+  try {
+    const result = await fetch(apiEndpoint, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        Authorization: `Bearer ${process.env.SANITY_TOKEN_API}`,
+      },
+      body: JSON.stringify(mutations),
+    });
 
-  const json = await result.json();
+    const json = await result.json();
 
-  return NextResponse.json({ json });
+    return NextResponse.json({ json });
+  } catch (error) {
+    console.log(error);
+    throw new Error("Adding tweet hasn't gone well, try again later");
+  }
 }

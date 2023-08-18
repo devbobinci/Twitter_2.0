@@ -6,8 +6,11 @@ export const fetchComments = async (tweetId: string) => {
   );
 
   const data = await res.json();
-
-  const comments: Comment[] = data.comments;
-
-  return comments;
+  try {
+    const comments: Comment[] = data.comments;
+    return comments;
+  } catch (error) {
+    console.log(error);
+    throw new Error("Comments could not be get right now");
+  }
 };

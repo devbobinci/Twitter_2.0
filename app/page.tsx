@@ -8,6 +8,7 @@ import { fetchTweets } from "../lib/fetchTweets";
 import Feed from "./components/Feed";
 import Sidebar from "./components/Sidebar";
 import Widgets from "./components/Widgets";
+import { Toaster } from "react-hot-toast";
 
 export default function Home() {
   const [tweets, setTweets] = useState<Tweet[]>([]);
@@ -24,12 +25,9 @@ export default function Home() {
   return (
     <div className="lg:max-w-6xl mx-auto max-h-screen overflow-y-hidden">
       <main className="grid grid-cols-9 py-2">
-        {/* Sidebar */}
+        <Toaster />
         <Sidebar />
-
-        {/* Feed */}
         <Feed tweets={tweets} setTweets={setTweets} />
-        {/* Widgets */}
         <Widgets />
       </main>
     </div>

@@ -5,6 +5,9 @@ import "./globals.css";
 export const metadata = {
   title: "Twitter 2.0",
   description: "Clone of Twitter 2.0 created with Sanity CMS and Next.js",
+  icons: {
+    icon: "/twitter.png",
+  },
 };
 
 export default async function RootLayout({

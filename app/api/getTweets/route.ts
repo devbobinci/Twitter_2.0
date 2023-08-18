@@ -11,8 +11,11 @@ const feedQuery = groq`*[_type == "tweet" && !blockTweet]{
 } | order(_createdAt desc)`;
 
 export async function GET(req: NextRequest, res: NextResponse) {
-  const tweets: Tweet[] = await client.fetch(feedQuery);
-
-  // ! Zamiast res.json
-  return NextResponse.json({ tweets });
+  try {
+    const tweets: Tweet[] = await client.fetch(feedQuery);
+    return NextResponse.json({ tweets });
+  } catch (error) {
+    console.log(error);
+    throw new Error("Could not get tweets from an api");
+  }
 }
