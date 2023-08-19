@@ -77,7 +77,7 @@ export default function TweetCard({ tweet }: Props) {
 
   return (
     <div
-      className={`flex flex-col space-x-3 border-y p-5 border-gray-100 h-full`}
+      className={`flex flex-col space-x-3 border-y p-5 border-gray-100 h-full py-8`}
     >
       <div className="flex space-x-3">
         <Image
@@ -155,10 +155,10 @@ export default function TweetCard({ tweet }: Props) {
       )}
 
       {comments?.length > 0 && (
-        <div className="my-2 mt-5 space-y-5 border-t h-full border-gray-100 p-5 relative">
+        <div className="mt-5 space-y-5 border-t h-full border-gray-100 pt-5 relative">
           {comments.length > 1 && !readMore && (
             <div
-              className={`absolute w-full h-12 bg-white/80 -bottom-2 left-0 backdrop-blur-lg z-10`}
+              className={`absolute w-full h-12 bg-white/80 -bottom-2 left-0 backdrop-blur-lg z-10 transition`}
             />
           )}
           {sortedComments.map((comment, index) => (
